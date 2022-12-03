@@ -3,7 +3,7 @@ def main():
     st.set_page_config(
         page_title="SQL Injection",
     )
-    st.markdown("# Main page t 🎈")
+    st.markdown("# Main page 🎈")
     st.sidebar.markdown("# Main page 🎈")
 
 if __name__ == "__main__":
