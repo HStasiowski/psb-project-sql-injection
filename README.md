@@ -10,6 +10,56 @@
 `SELECT * FROM products WHERE product_name LIKE ''; DROP DATABASE if exists sqlitraining -- // ';`
 
 
+## Jak ulepszyć kod tak, aby nie był już podatny na ataki? 
+Łączenie się z bazą danych PostgreSQL i uruchomienie wszystkich kwerend w Pythonie wykonuje się w następujący sposób: 
+```python
+import psycopg2  
+  
+connection = psycopg2.connect(  
+    host="127.0.0.1",  
+    database="dellstore2",  
+    user="sqlinjection",  
+    password="3FS-DI"  
+)  
+with connection.cursor() as cursor:  
+    cursor.execute("SELECT username, password FROM customers;")  
+    print(cursor.fetchone())
+
+# ('user1', '15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225')
+```
+Jedyne miejsce podatne na ataki SQL Injection w tym kodzie znajduje się w linijce dziesiątej: 
+```python
+	cursor.execute("SELECT username, password FROM customers;")  
+```
+Jeżeli nasz zapytanie przyjmuje jakieś dane od użytkownika, to nie mogą one być po prostu wklejone bez żadnej weryfikacji. Poniżej jest podany **BŁĘDNY** sposób przyjmowania argumenów użytkownika: 
+```python
+username = "user1"  
+  
+with connection.cursor() as cursor:  
+    cursor.execute(f"SELECT firstname, lastname "  
+                   f"FROM customers WHERE username='{username}';")  
+    print(cursor.fetchone())
+```
+Czemu? A co się stanie, jeżeli zamiast `"user1"` użytkownik poda `"user1'; SELECT * FROM customers; --"`?  Wykona się następne polecenie SQL: 
+```SQL
+SELECT firstname, lastname FROM customers WHERE username='user1'; 
+SELECT * FROM customers; 
+--*"`
+```
+W takim przypadku użytkownik może dostać dowolne dane z bazy danych. Poprawnym zabezpieczeniem przed atakiem SQL Injection jest wykorzystanie specjalnych filtrów, które sprawdzają wartości otrzymane od użytkownika. W przypadku PostgreSQL i Pythona najprostszym rozwiązaniem jest użycie domyślnie dostępnej funkcji przekazywania parametrów: 
+```python
+username = "user1'; SELECT * FROM customers; --"
+
+with connection.cursor() as cursor:  
+    cursor.execute("SELECT firstname, lastname "  
+                   "FROM customers WHERE username=%(checked_username)s;",  
+                   {"checked_username": username})  
+    print(cursor.fetchone())
+
+# None
+```
+Jak widzimy, filtr skutecznie zablokował możliwość wyłowania takiego polecenia i zwróciło ono wartość `None`. 
+
 
 ## Config
 ### Postgres users
@@ -44,3 +94,6 @@ name: dellstore2
 - [x] Zmienić "niepoprawna nazwa" na "taki użytkownik już istnieje"
 - [x] Pozwolić początek pracy z dowolnej strony
 - [ ] Podać w Streamlit/dokumentacji pierwsze 10 wierszy z pliku `psb_project/dellstore2/database_readable_passwords.csv`, żeby można było testować hasła rzeczywistych już istniejących użytkowników. Można również powiedzieć, że hasła zostały przydzielone użytkownikom w kolejności zmniejszenia się ich popularności (user1 - najbardziej popularne, user20000 - najmniej popularne); jednak nie są to najpopularjniejsze hasła (po prostu losowo wybrane ze zbioru danych najpopularnieszych). 
+- [x] Opisać co trzeba zmienić w kodzie, aby nie był podatny na ataki SQL Injection.
+- [ ] *(jako pomysł, jeżeli Nyczu będzie mało tego, co zrobiliśmy)* Dodać przełącznik na tryb zabezpieczony, w którym kod już jest dobrze napisany i nie da się zaatakować przez SQL Inection.
+
