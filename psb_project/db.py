@@ -62,10 +62,16 @@ class DellStoreDB:
     def fill_db(self):
         cur = self.conn.cursor()
         logging.info("Starting to populate dellstore2 db tables with data...")
-        with open("dellstore2/dellstore2-normal-1.0.sql", "r") as sql_script:
-            cur.execute(sql_script.read())
-        logging.info("Done.")
-        cur.close()
+        try:
+            with open("dellstore2/dellstore2-normal-1.0.sql", "r") as sql_script:
+                cur.execute(sql_script.read())
+        except Exception as e:
+            logging.error(str(e))
+            return str(e)
+        else:
+            logging.info("Tables where populated successfully.")
+            cur.close()
+            return "Tabele zostały pomyślnie wypełnione danymi."
 
     def drop_tables(self):
         cur = self.conn.cursor()
@@ -112,6 +118,27 @@ class DellStoreDB:
             else:
                 return True, False, ret_text
 
+    def insert_user(self, username: str, password: str, firstname: str, lastname: str):
+        ret_text = ""
+        cur = self.conn.cursor()
+        try:
+            cur.execute(f"INSERT INTO dellstore2.public.customers (firstname, lastname, username, password) "
+                        f"VALUES ('{firstname}', '{lastname}', '{username}', '{password}') "
+                        f"on CONFLICT do NOTHING "
+                        f"RETURNING (xmax = 0) AS inserted;")
+        except Exception as e:
+            ret_text = str(e)
+            logging.error(str(e))
+            return False, ret_text
+        else:
+            ans = cur.fetchone()
+            cur.close()
+            logging.debug(f"Registered user:{firstname=} {lastname=} {username=} {password=}")
+            if ans is None:
+                return False, ret_text
+            else:
+                return True, ret_text
+
     def get_products(self, user_query: str):
         ret_text = ""
         sql_query = sqlalchemy.text(f"SELECT * "
@@ -133,6 +160,5 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     db = DellStoreDB()
     db.connect(**config["postgresql-dellstore2"])
-    # print(db.get_user("user12", "password"))
-    print(db.get_products("alaska')) or TRUE; -- "))
+    print(db.insert_user("vmorskyi", "123456", "vitalii", "morskyi"))
     db.disconnect()
