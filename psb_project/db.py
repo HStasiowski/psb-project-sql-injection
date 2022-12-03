@@ -63,15 +63,15 @@ class DellStoreDB:
         cur = self.conn.cursor()
         logging.info("Starting to populate dellstore2 db tables with data...")
         try:
-            with open("dellstore2/dellstore2-normal-1.0.sql", "r") as sql_script:
+            with open("psb_project/dellstore2/dellstore2-normal-1.0.sql", "r") as sql_script:
                 cur.execute(sql_script.read())
         except Exception as e:
             logging.error(str(e))
-            return str(e)
+            return False, str(e)
         else:
             logging.info("Tables where populated successfully.")
             cur.close()
-            return "Tabele zostały pomyślnie wypełnione danymi."
+            return True, "Tabele zostały pomyślnie wypełnione danymi."
 
     def drop_tables(self):
         cur = self.conn.cursor()

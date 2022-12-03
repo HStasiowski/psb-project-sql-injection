@@ -55,8 +55,11 @@ def main():
     st.sidebar.subheader("Przywracanie bazy do stanu początkowego")
     if st.sidebar.button("Przywróc bazę"):
         st.session_state['db'].drop_tables()
-        result = st.session_state['db'].fill_db()
-        st.sidebar(result)
+        is_not_error, result = st.session_state['db'].fill_db()
+        if is_not_error:
+            st.sidebar.success(result)
+        else:
+            st.sidebar.error(result)
 
 if __name__ == "__main__":
     st.session_state['db'] = init_connection()
