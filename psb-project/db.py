@@ -54,27 +54,30 @@ class DellStoreDB:
             self.is_connected = False
 
     def create_db(self):
-        self.drop_db()
         cur = self.conn.cursor()
         cur.execute("CREATE DATABASE dellstore2 OWNER sqlinjection TABLESPACE dbspace;")
+        logging.info("Database dellstore2 has been created.")
         cur.close()
 
     def fill_db(self):
         cur = self.conn.cursor()
+        logging.info("Starting to populate dellstore2 db tables with data...")
         with open("dellstore2/dellstore2-normal-1.0.sql", "r") as sql_script:
             cur.execute(sql_script.read())
+        logging.info("Done.")
         cur.close()
 
     def drop_db(self):
         cur = self.conn.cursor()
         cur.execute("DROP DATABASE IF EXISTS dellstore2;")
+        logging.info("Database dellstore2 has been dropped.")
         cur.close()
 
-    def row_exists(self, username: str, password: str):
+    def get_user(self, username: str, password: str):
         cur = self.conn.cursor()
         cur.execute(f"SELECT * "
                     f"FROM dellstore2.public.customers "
-                    f"WHERE username='{username}' AND password='{password}';")
+                    f"WHERE username='{username}' $ AND password='{password}';")
         ans = cur.fetchone()
         print(ans)
         cur.close()
@@ -88,7 +91,7 @@ class DellStoreDB:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     db = DellStoreDB()
-    db.connect(**config["postgresql-postgres"])
-    db.create_db()
+    db.connect(**config["postgresql-dellstore2"])
+    db.get_user("user12", "password")
     print("Success")
     db.disconnect()
