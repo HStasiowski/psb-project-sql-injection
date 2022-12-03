@@ -1,6 +1,9 @@
 import hashlib
+
 import streamlit as st
+
 from psb_project.SQL_Injection import init_connection
+
 
 def make_hash(password):
     return hashlib.sha256(str.encode(password)).hexdigest()
@@ -15,7 +18,7 @@ def main():
     if choice == "Logowanie":
         st.subheader("Logowanie")
         username = st.text_input("Nazwa użytkownika")
-        password = st.text_input("Hasło",type='password')
+        password = st.text_input("Hasło", type='password')
         if st.button("✅ Zaloguj się"):
             hashed_password = make_hash(password)
             result, is_error, text = st.session_state['db'].get_user(username, hashed_password)
@@ -28,14 +31,14 @@ def main():
                     st.text(text)
                 else:
                     st.warning("Nie poprawne hasło/nazwa użytkownika!")
-                
+
     elif choice == "Rejestracja":
         st.subheader("Utwórz nowe konto")
         firstname = st.text_input("Imię")
         lastname = st.text_input("Nazwisko")
         st.subheader("Dane do logowania")
         register_username = st.text_input("Nazwa użytkownika")
-        register_password = st.text_input("Hasło",type='password')
+        register_password = st.text_input("Hasło", type='password')
         username = register_username
         password = register_password
         if st.button("✅ Utwórz konto"):
@@ -49,8 +52,10 @@ def main():
                 st.text(text)
 
     if st.button("❔ Wskazówka SQL Injection"):
-        st.write("Próbująć wstrzyknąć kod w panelu logowania, możemy wykorzystać pole tekstowe hasła. Wykorzystując metodę wstawiającą nowy warunek do zapytania.")
-        st.code("' OR 1=1;--",language="sql")
+        st.write(
+            "Próbująć wstrzyknąć kod w panelu logowania, możemy wykorzystać pole tekstowe hasła. Wykorzystując metodę "
+            "wstawiającą nowy warunek do zapytania.")
+        st.code("' OR 1=1;--", language="sql")
 
     st.sidebar.subheader("Przywracanie bazy do stanu początkowego")
     if st.sidebar.button("Przywróc bazę"):
@@ -60,6 +65,7 @@ def main():
             st.sidebar.success(result)
         else:
             st.sidebar.error(result)
+
 
 if __name__ == "__main__":
     st.session_state['db'] = init_connection()

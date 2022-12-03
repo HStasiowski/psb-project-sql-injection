@@ -1,5 +1,7 @@
 import streamlit as st
+
 from psb_project.SQL_Injection import init_connection
+
 
 def db_restart():
     error_text = "Katastrofalny błąd 1"
@@ -9,14 +11,14 @@ def db_restart():
 def main():
     st.title("Wyszukiwanie filmów: ")
     title = st.text_input("Wprowadź tytuł lub aktora filmu: ")
-    
+
     table, is_error, querry_message = st.session_state['db'].get_products(title)
 
     if is_error:
         st.error(querry_message)
     else:
         st.table(table.head(100))
-    
+
     if len(table) > 100: st.text("* Wynik został ograniczony do 100 wierszy.")
 
     st.sidebar.subheader("Przywracanie bazy do stanu początkowego")
@@ -29,8 +31,11 @@ def main():
             st.sidebar.error(result)
 
     if st.button("❔ Wskazówka SQL Injection"):
-        st.write("Wstrzyknięcie kodu w tym przypadku może odbyć się poprzez ucieczkę z warunków LIKE. Możemy następnie wykorzystać nowe zapytanie, zawierające np. prośbę o wyświetlenie tabeli klientów.")
-        st.code("')); SELECT * FROM customers; --",language="sql")
+        st.write(
+            "Wstrzyknięcie kodu w tym przypadku może odbyć się poprzez ucieczkę z warunków LIKE. Możemy następnie "
+            "wykorzystać nowe zapytanie, zawierające np. prośbę o wyświetlenie tabeli klientów.")
+        st.code("')); SELECT * FROM customers; --", language="sql")
+
 
 if __name__ == "__main__":
     st.session_state['db'] = init_connection()
