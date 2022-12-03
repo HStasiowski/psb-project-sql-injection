@@ -1,4 +1,5 @@
 import streamlit as st
+from psb_project import db
 
 def db_restart():
     error_text = "Katastrofalny błąd 1"
@@ -41,11 +42,15 @@ def main():
     
     st.sidebar.subheader("Przywracanie bazy do stanu początkowego")
     if st.sidebar.button("Przywróc bazę"):
-        result, error_text = db_restart()
-        if result:
-            st.sidebar.success("Poprawnie przywrócono bazę")
-        else:
-            st.sidebar.error("Nie udało się przywrócić bazy")
-            st.sidebar.text(error_text)
+        st.session_state['db'].drop_tables()
+        result = st.session_state['db'].fill_db()
+        st.sidebar(result)
+        
 if __name__ == "__main__":
+    @st.experimental_singleton
+    def init_connection():
+        database = db.DellStoreDB()
+        database.connect(**config["postgresql-dellstore2"])
+        return database
+    st.session_state['db'] = init_connection()
     main()
