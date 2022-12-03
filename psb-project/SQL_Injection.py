@@ -6,14 +6,14 @@ def db_restart():
 
 def main():
     st.set_page_config(
-        page_title="SQL Injection",
+        page_title="SQL Injection"
     )
     st.title("SQL Injection")
-
+    st.write("Często wykorzystywaną metodą ataku na aplikacje jest SQL Injection. Polega ona na wstrzyknięciu odpowiedniego polecenia, w niezabezpieczone pole tekstowe.")
     st.subheader("Schemat bazy danych")
 
     st.subheader("Resetowanie bazy")
-    st.text("")
+    st.write("Po wykonaniu ćwiczeń, może się okazać że aplikcja nie będzie funkcjonować tak jak powinna (np. po usunięciu tabeli). W celu przywrócenia poprawnego działania trzeba skorzystać z funkcji przywracania bazy do stanu początkowego.")
     if st.button("Przywróc bazę"):
         result, error_text = db_restart()
         if result:

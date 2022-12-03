@@ -54,7 +54,10 @@ class DellStoreDB:
 
     def create_db(self):
         cur = self.conn.cursor()
-        cur.execute("CREATE DATABASE dellstore2 OWNER sqlinjection TABLESPACE dbspace;")
+        cur.execute("DROP DATABASE IF EXISTS dellstore2; "
+                    "CREATE DATABASE dellstore2 OWNER sqlinjection TABLESPACE dbspace; ")
+        with open("dellstore2/dellstore2-normal-1.0.sql", "r") as sql_script:
+            cur.execute(sql_script.read())
         cur.close()
 
     def drop_db(self):
