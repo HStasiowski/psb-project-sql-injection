@@ -67,6 +67,20 @@ class DellStoreDB:
         logging.info("Done.")
         cur.close()
 
+    def drop_tables(self):
+        cur = self.conn.cursor()
+        cur.execute("DROP TABLE IF EXISTS public.categories ;"
+                    "DROP TABLE IF EXISTS public.cust_hist; "
+                    "DROP TABLE IF EXISTS public.inventory; "
+                    "DROP TABLE IF EXISTS public.orderlines; "
+                    "DROP TABLE IF EXISTS public.orders; "
+                    "DROP TABLE IF EXISTS public.customers; "
+                    "DROP TABLE IF EXISTS public.products; "
+                    "DROP TABLE IF EXISTS public.reorder; "
+                    "DROP FUNCTION IF EXISTS public.new_customer;")
+        cur.close()
+
+
     def drop_db(self):
         cur = self.conn.cursor()
         cur.execute("DROP DATABASE IF EXISTS dellstore2;")
@@ -74,24 +88,32 @@ class DellStoreDB:
         cur.close()
 
     def get_user(self, username: str, password: str):
+        ret_text = ""
         cur = self.conn.cursor()
-        cur.execute(f"SELECT * "
-                    f"FROM dellstore2.public.customers "
-                    f"WHERE username='{username}' $ AND password='{password}';")
-        ans = cur.fetchone()
-        print(ans)
-        cur.close()
-        logging.debug(f"Login as {username=} {password=}")
-        if ans is None:
-            return False
+        try:
+            cur.execute(f"SELECT * "
+                        f"FROM dellstore2.public.customers "
+                        f"WHERE username='{username}' AND password='{password}';")
+        except Exception as e:
+            ret_text = str(e)
+            logging.error(str(e))
+            return False, ret_text
         else:
-            return True
+            ans = cur.fetchone()
+            print(ans)
+            cur.close()
+            logging.debug(f"Login as {username=} {password=}")
+            if ans is None:
+                return False, ret_text
+            else:
+                return True, ret_text
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     db = DellStoreDB()
     db.connect(**config["postgresql-dellstore2"])
-    db.get_user("user12", "password")
-    print("Success")
+    # db.get_user("user12' &", "password")
+    db.drop_tables()
+    db.fill_db()
     db.disconnect()
