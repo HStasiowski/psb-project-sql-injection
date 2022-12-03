@@ -11,7 +11,7 @@ def make_hash(password):
 def login(username, password):
     #should return TRUE, FALSE
     querry_message = "test"
-    return True, querry_message
+    return False, querry_message
 
 def register(username, password, firstname, lastname):
     #Password and name validation
