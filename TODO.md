@@ -1,4 +1,4 @@
-- [ ] Poprawić relacje w bazie danych
+- [ ] ~~Poprawić relacje w bazie danych~~
 - [ ] Podmienić hasła
 - [x] Automatycznie wyczyszczenie na panelu logowania (zmiana logowanie/rejestreacja)
 - [x] Inna nazwa przycisku załóż konto
