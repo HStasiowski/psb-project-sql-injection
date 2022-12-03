@@ -1,7 +1,7 @@
 import configparser
 import logging
-from typing import Any
 
+import pandas as pd
 import psycopg2
 import sqlalchemy
 
@@ -80,7 +80,6 @@ class DellStoreDB:
                     "DROP FUNCTION IF EXISTS public.new_customer;")
         cur.close()
 
-
     def drop_db(self):
         cur = self.conn.cursor()
         cur.execute("DROP DATABASE IF EXISTS dellstore2;")
@@ -88,6 +87,12 @@ class DellStoreDB:
         cur.close()
 
     def get_user(self, username: str, password: str):
+        """User login query (with injection)
+
+        :param username:
+        :param password:
+        :return: (bool, bool, str) : Logged in?, With error?, Error message
+        """
         ret_text = ""
         cur = self.conn.cursor()
         try:
@@ -97,23 +102,37 @@ class DellStoreDB:
         except Exception as e:
             ret_text = str(e)
             logging.error(str(e))
-            return False, ret_text
+            return False, True, ret_text
         else:
             ans = cur.fetchone()
-            print(ans)
             cur.close()
             logging.debug(f"Login as {username=} {password=}")
             if ans is None:
-                return False, ret_text
+                return False, False, ret_text
             else:
-                return True, ret_text
+                return True, False, ret_text
+
+    def get_products(self, user_query: str):
+        ret_text = ""
+        sql_query = sqlalchemy.text(f"SELECT * "
+                                    f"FROM dellstore2.public.products "
+                                    f"WHERE (actor LIKE upper('%{user_query}%')) "
+                                    f"   OR (title LIKE upper('%{user_query}%'));")
+        try:
+            df = pd.read_sql(sql_query, self.sqlalchemy_engine)
+        except Exception as e:
+            ret_text = str(e)
+            logging.error(str(e))
+            return pd.DataFrame(), True, ret_text
+        else:
+            logging.debug(f"Search result: {df.shape=}")
+            return df, False, ret_text
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     db = DellStoreDB()
     db.connect(**config["postgresql-dellstore2"])
-    # db.get_user("user12' &", "password")
-    db.drop_tables()
-    db.fill_db()
+    # print(db.get_user("user12", "password"))
+    print(db.get_products("alaska')) or TRUE; -- "))
     db.disconnect()
