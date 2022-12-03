@@ -17,11 +17,11 @@ class DellStoreDB:
         self.is_connected = False
         self.sqlalchemy_engine: sqlalchemy.engine.base.Engine | None = None
 
-    def connect(self):
+    def connect(self, **kwargs):
         """Connect to the PostgreSQL database server."""
         try:
             logging.info("Connecting to the PostgreSQL database...")
-            self.conn = psycopg2.connect(**config["postgresql"])
+            self.conn = psycopg2.connect(**kwargs)
             self.sqlalchemy_engine = sqlalchemy.create_engine(
                 'postgresql+psycopg2://',
                 creator=lambda: self.conn)
@@ -52,6 +52,16 @@ class DellStoreDB:
             logging.warning(f"self.is_connected set to False (before it was {self.is_connected}).")
             self.is_connected = False
 
+    def create_db(self):
+        cur = self.conn.cursor()
+        cur.execute("CREATE DATABASE dellstore2 OWNER sqlinjection TABLESPACE dbspace;")
+        cur.close()
+
+    def drop_db(self):
+        cur = self.conn.cursor()
+        cur.execute("DROP DATABASE IF EXISTS dellstore2;")
+        cur.close()
+
     def row_exists(self, key_value: Any, key_column: str, table: str):
         """Checks whether there is a record with
         the same `key_value` in the specified `table`."""
@@ -73,6 +83,6 @@ class DellStoreDB:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     db = DellStoreDB()
-    db.connect()
+    db.connect(**config["postgresql-postgres"])
     print("Success")
     db.disconnect()

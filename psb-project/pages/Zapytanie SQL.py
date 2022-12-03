@@ -12,7 +12,7 @@ def get_movies_table(title):
     return table, is_error, querry_message
 
 def main():
-    st.subheader("Wyszukiwanie filmów: ")
+    st.title("Wyszukiwanie filmów: ")
     title = st.text_input("Wprowadź tytuł filmu: ")
     
     movies_table, is_error, querry_message = get_movies_table(title)
