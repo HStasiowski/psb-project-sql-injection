@@ -2,6 +2,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+def db_restart():
+    error_text = "Katastrofalny błąd 1"
+    return False, error_text
+
 def get_movies_table(title):
     table = pd.DataFrame(
     np.random.randn(10, 5),
@@ -21,6 +25,15 @@ def main():
         st.error(querry_message)
     else:
         st.table(movies_table)
+    
+    st.sidebar.subheader("Przywracanie bazy do stanu początkowego")
+    if st.sidebar.button("Przywróc bazę"):
+        result, error_text = db_restart()
+        if result:
+            st.sidebar.success("Poprawnie przywrócono bazę")
+        else:
+            st.sidebar.error("Nie udało się przywrócić bazy")
+            st.sidebar.text(error_text)
 
 if __name__ == "__main__":
     main()

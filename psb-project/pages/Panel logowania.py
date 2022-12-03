@@ -1,6 +1,10 @@
 import hashlib
 import streamlit as st
 
+def db_restart():
+    error_text = "Katastrofalny błąd 1"
+    return False, error_text
+
 def make_hash(password):
     return hashlib.sha256(str.encode(password)).hexdigest()
 
@@ -52,6 +56,13 @@ def main():
                 st.warning("Nie poprawne hasło/nazwa użytkownika")
                 st.text(text)
 
-
+    st.sidebar.subheader("Przywracanie bazy do stanu początkowego")
+    if st.sidebar.button("Przywróc bazę"):
+        result, error_text = db_restart()
+        if result:
+            st.sidebar.success("Poprawnie przywrócono bazę")
+        else:
+            st.sidebar.error("Nie udało się przywrócić bazy")
+            st.sidebar.text(error_text)
 if __name__ == "__main__":
     main()

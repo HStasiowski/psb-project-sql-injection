@@ -27,6 +27,7 @@ class DellStoreDB:
                 creator=lambda: self.conn)
 
             # Display PostgreSQL version
+            self.conn.autocommit = True
             cur = self.conn.cursor()
             cur.execute('SELECT version()')
             logging.info(f"PostgreSQL version:\t{cur.fetchone()}")
@@ -53,9 +54,13 @@ class DellStoreDB:
             self.is_connected = False
 
     def create_db(self):
+        self.drop_db()
         cur = self.conn.cursor()
-        cur.execute("DROP DATABASE IF EXISTS dellstore2; "
-                    "CREATE DATABASE dellstore2 OWNER sqlinjection TABLESPACE dbspace; ")
+        cur.execute("CREATE DATABASE dellstore2 OWNER sqlinjection TABLESPACE dbspace;")
+        cur.close()
+
+    def fill_db(self):
+        cur = self.conn.cursor()
         with open("dellstore2/dellstore2-normal-1.0.sql", "r") as sql_script:
             cur.execute(sql_script.read())
         cur.close()
@@ -65,18 +70,15 @@ class DellStoreDB:
         cur.execute("DROP DATABASE IF EXISTS dellstore2;")
         cur.close()
 
-    def row_exists(self, key_value: Any, key_column: str, table: str):
-        """Checks whether there is a record with
-        the same `key_value` in the specified `table`."""
+    def row_exists(self, username: str, password: str):
         cur = self.conn.cursor()
-        query = (f"SELECT {key_column} "
-                 f"FROM   {table} "
-                 f"WHERE  {key_column} = %s;")
-        cur.execute(query, (key_value,))
+        cur.execute(f"SELECT * "
+                    f"FROM dellstore2.public.customers "
+                    f"WHERE username='{username}' AND password='{password}';")
         ans = cur.fetchone()
+        print(ans)
         cur.close()
-        logging.debug(f"Check if exists {key_column=} {key_value=} in {table}"
-                      f"Response {True if ans is not None else False}.")
+        logging.debug(f"Login as {username=} {password=}")
         if ans is None:
             return False
         else:
@@ -87,5 +89,6 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     db = DellStoreDB()
     db.connect(**config["postgresql-postgres"])
+    db.create_db()
     print("Success")
     db.disconnect()
