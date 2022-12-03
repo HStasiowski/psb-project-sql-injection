@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-#from psb_project import db
+from psb_project import db
 
 def db_restart():
     error_text = "Katastrofalny błąd 1"
