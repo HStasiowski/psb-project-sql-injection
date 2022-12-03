@@ -79,6 +79,22 @@ name: dellstore2
 
 
 
+## Instructions
+```
+git clone https://github.com/FrightenedFox/psb-project-sql-injection
+cd psb-project-sql-injection
+pip install -e .
+streamlit run psb_project/SQL_Injection.py
+```
+Aby uruchomić aplikacje i zamnąć konsolę (instrukcja [stąd](https://linuxize.com/post/how-to-run-linux-commands-in-background/)): 
+```
+streamlit run psb_project/SQL_Injection.py &
+disown %1
+```
+gdzie `1`  oznacza numer procesu w tle, można otrzymać wpisując `jobs -l`.
+
+
+
 ## Sources
 1. [SQL injection examples for practice](https://thehackerish.com/sql-injection-examples-for-practice/)  - OWASP training 
 2. [SQL Injection Exercise](https://research.cs.wisc.edu/mist/SoftwareSecurityCourse/Exercises/3.8.1_SQL_Injection_Exercise.html) - VirtualBox Image (not working: kernel panic)
