@@ -28,6 +28,10 @@ def main():
         else:
             st.sidebar.error(result)
 
+    if st.button("❔ Wskazówka SQL Injection"):
+        st.write("Wstrzyknięcie kodu w tym przypadku może odbyć się poprzez ucieczkę z warunków LIKE. Możemy następnie wykorzystać nowe zapytanie, zawierające np. prośbę o wyświetlenie tabeli klientów.")
+        st.code("')); SELECT * FROM customers; --",language="sql")
+
 if __name__ == "__main__":
     st.session_state['db'] = init_connection()
     main()
