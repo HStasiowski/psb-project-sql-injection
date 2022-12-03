@@ -1,14 +1,16 @@
 import streamlit as st
 from psb_project import db
+import configparser
 
-def db_restart():
-    error_text = "Katastrofalny błąd 1"
-    return False, error_text
+@st.experimental_singleton
+def init_connection():
+    config = configparser.ConfigParser()
+    config.read('./psb_project/config.ini')
+    database = db.DellStoreDB()
+    database.connect(**config["postgresql-dellstore2"])
+    return database
 
 def main():
-    st.set_page_config(
-        page_title="SQL Injection"
-    )
     st.title("SQL Injection")
     st.write("Często wykorzystywaną metodą ataku na aplikacje jest SQL Injection. Polega ona na wstrzyknięciu odpowiedniego polecenia, w niezabezpieczone pole tekstowe.")
 
@@ -35,7 +37,7 @@ def main():
     st.header("Schemat bazy danych")
     st.write("Wykorzystany schemat bazy to symulacja sklepu z filmami DELL Store 2, a aplikacja do ćwiczenia ataków jest oparta na bazie PostgreSQL. Panel logowania weryfikuje użytkowników na podstawie tabeli customers (username, password).")
     st.code("https://linux.dell.com/dvdstore/",language="uri")
-    st.image("../schema_dark.png")
+    st.image("./schema_dark.png")
 
     st.header("Resetowanie bazy")
     st.write("Po wykonaniu ćwiczeń, może się okazać że aplikcja nie będzie funkcjonować tak jak powinna (np. po usunięciu tabeli). W celu przywrócenia poprawnego działania trzeba skorzystać z funkcji przywracania bazy do stanu początkowego, znajdującego się w menu strony.")
@@ -45,12 +47,7 @@ def main():
         st.session_state['db'].drop_tables()
         result = st.session_state['db'].fill_db()
         st.sidebar(result)
-        
+
 if __name__ == "__main__":
-    @st.experimental_singleton
-    def init_connection():
-        database = db.DellStoreDB()
-        database.connect(**config["postgresql-dellstore2"])
-        return database
     st.session_state['db'] = init_connection()
     main()

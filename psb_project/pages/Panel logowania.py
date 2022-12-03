@@ -1,5 +1,6 @@
 import hashlib
 import streamlit as st
+from psb_project.SQL_Injection import init_connection
 
 def make_hash(password):
     return hashlib.sha256(str.encode(password)).hexdigest()
@@ -15,7 +16,7 @@ def main():
         st.subheader("Logowanie")
         username = st.text_input("Nazwa użytkownika")
         password = st.text_input("Hasło",type='password')
-        if st.button("✅ Utwórz konto"):
+        if st.button("✅ Zaloguj się"):
             hashed_password = make_hash(password)
             result, is_error, text = st.session_state['db'].get_user(username, hashed_password)
 
@@ -26,23 +27,25 @@ def main():
                     st.error("Błąd logowania")
                     st.text(text)
                 else:
-                    st.warning("Nie poprawne hasło/nazwa użytkownika")
+                    st.warning("Nie poprawne hasło/nazwa użytkownika!")
                 
     elif choice == "Rejestracja":
         st.subheader("Utwórz nowe konto")
         firstname = st.text_input("Imię")
         lastname = st.text_input("Nazwisko")
         st.subheader("Dane do logowania")
-        username = st.text_input("Nazwa użytkownika")
-        password = st.text_input("Hasło",type='password')
+        register_username = st.text_input("Nazwa użytkownika")
+        register_password = st.text_input("Hasło",type='password')
+        username = register_username
+        password = register_password
         if st.button("✅ Utwórz konto"):
-            hashed_password = make_hash(password)
-            result, text = st.session_state['db'].insert_user(username, hashed_password, firstname, lastname)
+            hashed_password = make_hash(register_password)
+            result, text = st.session_state['db'].insert_user(register_username, hashed_password, firstname, lastname)
 
             if result:
                 st.success("Poprawnie utworzono nowe konto")
             else:
-                st.warning("Nie poprawne hasło/nazwa użytkownika")
+                st.warning("Taki użytkownik już istnieje!")
                 st.text(text)
 
     if st.button("❔ Wskazówka SQL Injection"):
@@ -56,4 +59,5 @@ def main():
         st.sidebar(result)
 
 if __name__ == "__main__":
+    st.session_state['db'] = init_connection()
     main()
