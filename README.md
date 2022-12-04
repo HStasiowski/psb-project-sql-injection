@@ -112,4 +112,7 @@ gdzie `1`  oznacza numer procesu w tle, można otrzymać wpisując `jobs -l`.
 - [ ] Podać w Streamlit/dokumentacji pierwsze 10 wierszy z pliku `psb_project/dellstore2/database_readable_passwords.csv`, żeby można było testować hasła rzeczywistych już istniejących użytkowników. Można również powiedzieć, że hasła zostały przydzielone użytkownikom w kolejności zmniejszenia się ich popularności (user1 - najbardziej popularne, user20000 - najmniej popularne); jednak nie są to najpopularjniejsze hasła (po prostu losowo wybrane ze zbioru danych najpopularnieszych). 
 - [x] Opisać co trzeba zmienić w kodzie, aby nie był podatny na ataki SQL Injection.
 - [ ] *(jako pomysł, jeżeli będzie mało tego, co zrobiliśmy)* Dodać przełącznik na tryb zabezpieczony, w którym kod już jest dobrze napisany i nie da się zaatakować przez SQL Inection.
+- [ ] Na zakładce "Wyszukiwarka filmów" raczej dobrze by było podnieść tą wskazówke SQL Inection do góry, bo na dole tam nikt jej nie znajdzie.
+- [ ] Wskazówka na stronie logowania nie działa, bo używamy funkcji haszującej. 
+- [ ] 
 
