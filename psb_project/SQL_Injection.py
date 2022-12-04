@@ -28,7 +28,7 @@ def main():
     st.write(
         "Niezabezpieczone pole tekstowe w aplikacji przeważnie będzie składało się z zapytania do bazy podobnego do "
         "tego poniżej. Jest to najprostsze, a zarazem najbardziej niebezpieczne rozwiązanie, ponieważ zostawia lukę "
-        "na wstrzyknięcie złośliewgo kodu.")
+        "na wstrzyknięcie złośliwego kodu.")
     st.code("SELECT customerid FROM customers WHERE username = '$nazwa_uzytkownika' AND password = '$haslo';",
             language="sql")
 
@@ -52,7 +52,7 @@ def main():
         "hasło, zgadzają się z tymi zapisanymi w systemie. Wprowadzając zmiany do zapytania, możemy sprawić, że mimo "
         "złego hasła system nadal zaakceptuje logowanie.")
     st.code("$haslo = \"' OR 1=1;--\"", language="sql")
-    st.write("SELECT po wstawieniu złosliwego kodu:")
+    st.write("SELECT po wstawieniu złośliwego kodu:")
     st.code("SELECT customerid FROM customers WHERE username = '$nazwa_uzytkownika' AND password = '' OR 1=1;--'",
             language="sql")
     st.write(
@@ -71,7 +71,7 @@ def main():
     st.header("Tabela użytkowników")
     st.write(
         "W bazie jest zarejestrowanych domyślnie 20 000 użytkowników. Przydzielone do nich hasła zostały wylosowane "
-        "z listy najcześniej używanych oraz przydzielone użytkownikom w taki sposób, że pierwszy posiada "
+        "z listy najczęściej używanych oraz przydzielone użytkownikom w taki sposób, że pierwszy posiada "
         "najpopularniejsze, a ostatni najrzadsze.")
     st.subheader("Top 3 najczęściej przydzielone hasła do użytkowników.")
     col1, col2, col3 = st.columns(3)
@@ -80,7 +80,8 @@ def main():
     col3.metric("user3", "111111")
 
     try:
-        readable_passwords = pd.read_csv("./psb_project/dellstore2/database_readable_passwords.csv", delimiter=';', nrows= 10)
+        readable_passwords = pd.read_csv("./psb_project/dellstore2/database_readable_passwords.csv",
+                                         delimiter=';', nrows=10)
     except Exception:
         st.error("Wystąpił błąd podczas wczytywania tabeli.")
     else:
@@ -89,11 +90,11 @@ def main():
     st.header("Resetowanie bazy")
     st.write(
         "Po wykonaniu ćwiczeń, może się okazać, że aplikacja nie będzie funkcjonować tak jak powinna (np. po usunięciu "
-        "tabeli). W celu przywrócenia poprawnego działani, trzeba skorzystać z funkcji przywracania bazy do stanu "
+        "tabeli). W celu przywrócenia poprawnego działania, trzeba skorzystać z funkcji przywracania bazy do stanu "
         "początkowego, znajdującego się w menu strony.")
 
     st.sidebar.subheader("Przywracanie bazy do stanu początkowego")
-    if st.sidebar.button("Przywróc bazę"):
+    if st.sidebar.button("Przywróć bazę"):
         st.session_state['db'].drop_tables()
         is_not_error, result = st.session_state['db'].fill_db()
         if is_not_error:

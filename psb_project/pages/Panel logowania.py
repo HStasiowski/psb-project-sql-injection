@@ -53,12 +53,13 @@ def main():
 
     if st.button("❔ Wskazówka SQL Injection"):
         st.write(
-            "Próbując wpisać kod w panelu logowania, możemy wykorzystać pole tekstowe nazwy użytkownika. Używając metody "
+            "Próbując wpisać kod w panelu logowania, możemy wykorzystać pole tekstowe nazwy użytkownika. Używając "
+            "metody "
             "wstawiającej nowy warunek do zapytania.")
         st.code("' OR 1=1;--", language="sql")
 
     st.sidebar.subheader("Przywracanie bazy do stanu początkowego")
-    if st.sidebar.button("Przywróc bazę"):
+    if st.sidebar.button("Przywróć bazę"):
         st.session_state['db'].drop_tables()
         is_not_error, result = st.session_state['db'].fill_db()
         if is_not_error:
