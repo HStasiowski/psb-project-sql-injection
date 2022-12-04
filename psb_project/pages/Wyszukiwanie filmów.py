@@ -14,6 +14,12 @@ def main():
 
     table, is_error, querry_message = st.session_state['db'].get_products(title)
 
+    if st.button("❔ Wskazówka SQL Injection"):
+        st.write(
+            "Wpisanie kodu w tym przypadku może odbyć się poprzez ucieczkę z warunków LIKE. Możemy następnie "
+            "wykorzystać nowe zapytanie, zawierające np. prośbę o wyświetlenie tabeli klientów.")
+        st.code("')); SELECT * FROM customers; --", language="sql")
+
     if is_error:
         st.error(querry_message)
     else:
@@ -29,13 +35,6 @@ def main():
             st.sidebar.success(result)
         else:
             st.sidebar.error(result)
-
-    if st.button("❔ Wskazówka SQL Injection"):
-        st.write(
-            "Wstrzyknięcie kodu w tym przypadku może odbyć się poprzez ucieczkę z warunków LIKE. Możemy następnie "
-            "wykorzystać nowe zapytanie, zawierające np. prośbę o wyświetlenie tabeli klientów.")
-        st.code("')); SELECT * FROM customers; --", language="sql")
-
 
 if __name__ == "__main__":
     st.session_state['db'] = init_connection()
