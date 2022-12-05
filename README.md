@@ -1,23 +1,24 @@
 
 ## Co zrobiliśmy? 
-1. Przeprowadzono badanie w celu sprawdzenia istniejących rozwiązań. Przetestowano trzy rózne środowiska testowe do nauczania się atakom SQL Injection: 
+1. Przeprowadziliśmy badanie w celu wykorzystania istniejących rozwiązań. Przetestowaliśmy trzy różne środowiska testowe do ćwiczenia ataków SQL Injection: 
 	1. [OWASP WebGoat i OWASP Zap](https://thehackerish.com/sql-injection-examples-for-practice/) -  kompleksowy przewodnik po testowaniu bezpieczeństwa aplikacji internetowych i usług internetowych, spośród których jest również SQL Injection.
-	2. [SQL Injection Exercise](https://research.cs.wisc.edu/mist/SoftwareSecurityCourse/Exercises/3.8.1_SQL_Injection_Exercise.html) - wprowadzenie do bezpiecznego programowania. Niestety nie udało się sprawdzić, ponieważ maszyna wirtualna, podana w rozwiązaniu, nie urucamia się skutecznie. 
+	2. [SQL Injection Exercise](https://research.cs.wisc.edu/mist/SoftwareSecurityCourse/Exercises/3.8.1_SQL_Injection_Exercise.html) - wprowadzenie do bezpiecznego programowania. Niestety nie udało się sprawdzić, ponieważ maszyna wirtualna, podana w rozwiązaniu, nie uruchamia się skutecznie. 
 	3. [Security of Information and Organizations - SQL Injection ](http://sweet.ua.pt/jpbarraca/course/sio-2122/lab-sql-injection/) - kurs *"Bezpieczeństwa informacji i organizacji"* od portugalskiego profesora João Paulo Barraca. Obszerny kurs laboratoriów bezpieczeństwa, które również pokrywają temat SQL Injection.
-2. Stwierdzono zrobić własne rozwiązanie, które byłoby podobnym do trzeciego rozwiązania *"Security of Information and Organizations - SQL Injection"*.
-3. Zakupiono i odpowiednio przygotowano Virtual Private Server (VPS) w systemie OVHCloud. Na nim został zainstalowany system Ubuntu. 
-4. Utworzono konta dla użytkowników (Jakub, Vitalii), zapewniono uwierzetylnianie tylko za pomocą szyfrowania asymetrycznego algorytmami RSA lub Ed25519. 
-5. Zainstalowano i odpowiednio skonfigurowano system bazodanowy PostgreSQL na VPS. Pobrano, ospowiednio zmodyfikowano i zainstalowano przykładową bazę danych Dell Store 2. 
-6. Zmodyfikowano kolumnę użytkowników "password" w taki sposób, aby zapisywane były hasła w postaci haszowanej. Znaleziono zbiór najczęściej wykorzystywanych haseł i przypisano go do wszystkich 20000 użytkowników.
-7. Przygotowano kod w języku Python do łączenia się z bazą danych oraz do przywrócenia bazy danych. 
-8. Przygotowano podatny na ataki SQL Injection kod w języku Python do wyłowania zapytań SQL.
-9. Za pomocą biblioteki Streamlit przygotowano stronę internetową - wizualny interfejs dla użytkownika. Strona zawiera trzy środowiska do przeprowadzania ataków: 
+2. Stwierdziliśmy, że zrobimy własne rozwiązanie, które byłoby podobnym do trzeciego rozwiązania *"Security of Information and Organizations - SQL Injection"*.
+3. Zakupiliśmy i odpowiednio przygotowaliśmy Virtual Private Server (VPS) w systemie OVHCloud, na nim został zainstalowany system Ubuntu. 
+4. Utworzyliśmy konta dla użytkowników (Jakub, Vitalii), ustawiliśmy uwierzytelnianie tylko za pomocą szyfrowania asymetrycznego algorytmami RSA lub Ed25519. 
+5. Zainstalowaliśmy i odpowiednio skonfigurowaliśmy system bazodanowy PostgreSQL na VPS, następnie pobraliśmy oraz odpowiednio zmodyfikowaliśmy i zainstalowaliśmy przykładową bazę danych (Dell Store 2). 
+6. Zmodyfikowaliśmy w tabeli customers kolumnę "password" w taki sposób, aby zapisywane były hasła w postaci haszowanej. Znaleźliśmy zbiór najczęściej wykorzystywanych haseł i przypisaliśmy go dla wszystkich 20 000 użytkowników.
+7. Przygotowaliśmy kod w języku Python do łączenia się z bazą danych oraz funkcję przywrócenia bazy do stanu początkowego.
+8. Przygotowaliśmy podatny na ataki (SQL Injection) kod w języku Python do wywoływania zapytań SQL.
+9. Za pomocą biblioteki Streamlit przygotowaliśmy stronę internetową - wizualny interfejs dla użytkownika. Strona zawiera trzy środowiska do przeprowadzania ataków: 
 	1. Panel logowania - jeden z najczęściej wykorzystywanych miejsc do ataku SQL Injection.
-	2. Panel rejestracji - pozwala tworzyć nowych użytkowników lub również przeprowadzać ataki.
-	3. Wyszukiwarka filmów - chclieliśmy pokazać jakie ataki można wykonywać, wykorzystując tabeli. 
-10. Na stronie internetowej również został dodany krótki poradnik na temat ataków SQL Injection z przykładami. Na każdym panelu są podane podpowiedzi z przykładowymi atakami. 
-11. Jeżeli użytkownik specjalnie czy przez przypadek zepsuję bazę danych, to na każdej stronie na panelu bocznym umieszczono przycisk, przywracający całą bazę. 
-12. Został przygotowany również poradnik, pokazujący w jaki sposób trzeba zmienić kod w języku Python, aby nie był już podatny na podstawowe ataki SQL Injection.
+	2. Panel rejestracji - pozwala wprowadzać nowych użytkowników do bazy danych oraz  przeprowadzać ataki wykorzystując pola tekstowe.
+	3. Wyszukiwarka filmów - chcieliśmy pokazać jakie ataki można wykonywać, wykorzystując tabele.
+10. Na stronie internetowej został dodany krótki poradnik na temat ataków SQL Injection z przykładami. 
+11. Na każdym panelu zostały dodane podpowiedzi, ułatwiające użytkownikowi przeprowadzenie ataku.
+12. Jeżeli użytkownik specjalnie czy przez przypadek zepsuję bazę danych, to w każdym momencie, korzystając z panelu bocznego może przywrócić bazę do stanu początkowego.
+13. Został przygotowany również poradnik, pokazujący w jaki sposób trzeba zmienić kod w języku Python, aby nie był już podatny na podstawowe ataki SQL Injection.
 
 
 
@@ -42,7 +43,7 @@ Jedyne miejsce podatne na ataki SQL Injection w tym kodzie znajduje się w linij
 ```python
 	cursor.execute("SELECT username, password FROM customers;")  
 ```
-Jeżeli nasz zapytanie przyjmuje jakieś dane od użytkownika, to nie mogą one być po prostu wklejone bez żadnej weryfikacji. Poniżej jest podany **BŁĘDNY** sposób przyjmowania argumenów użytkownika: 
+Jeżeli nasze zapytanie przyjmuje jakieś dane od użytkownika, to nie mogą one być po prostu wklejone bez żadnej weryfikacji. Poniżej jest podany **BŁĘDNY** sposób przyjmowania argumentów użytkownika: 
 ```python
 username = "user1"  
   
@@ -69,7 +70,7 @@ with connection.cursor() as cursor:
 
 # None
 ```
-Jak widzimy, filtr skutecznie zablokował możliwość wyłowania takiego polecenia i zwróciło ono wartość `None`. 
+Jak widzimy, filtr skutecznie zablokował możliwość wykonania takiego polecenia i zwróciło ono wartość `None`. 
 
 
 ## Config
@@ -90,20 +91,6 @@ name: dellstore2
 
 
 
-## Atacks
-1. Login without user password - attempt 1
-	User: bob, Password: ' OR 1=1; #
-	nie da się ponieważ pole $password jest haszowane
-2. Login without user password -  attempt 2
-	User: bob'; #
-
-`SELECT * FROM users where username='bob' and password='5f4dcc3b5aa765d61d8327deb882cf99';` 
-`bob'; #`
-`SELECT * FROM products WHERE product_name LIKE ''; DROP DATABASE if exists sqlitraining -- // ';`
-
-
-
-
 ## Instructions
 ```
 git clone https://github.com/FrightenedFox/psb-project-sql-injection
@@ -111,19 +98,13 @@ cd psb-project-sql-injection
 pip install -e .
 streamlit run psb_project/SQL_Injection.py
 ```
-Aby uruchomić aplikacje i zamnąć konsolę (instrukcja [stąd](https://linuxize.com/post/how-to-run-linux-commands-in-background/)): 
+Aby uruchomić aplikacje i zamknąć konsolę (instrukcja [stąd](https://linuxize.com/post/how-to-run-linux-commands-in-background/)): 
 ```
 streamlit run psb_project/SQL_Injection.py &
 disown %1
 ```
 gdzie `1`  oznacza numer procesu w tle, można otrzymać wpisując `jobs -l`.
 
-
-
-## Sources
-1. [SQL injection examples for practice](https://thehackerish.com/sql-injection-examples-for-practice/)  - OWASP training 
-2. [SQL Injection Exercise](https://research.cs.wisc.edu/mist/SoftwareSecurityCourse/Exercises/3.8.1_SQL_Injection_Exercise.html) - VirtualBox Image (not working: kernel panic)
-3. [Lab - SQL Injection ](http://sweet.ua.pt/jpbarraca/course/sio-2122/lab-sql-injection/) - Docker image (on linux)
 
 
 
