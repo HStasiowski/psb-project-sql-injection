@@ -1,13 +1,24 @@
-## Atacks
-1. Login without user password - attempt 1
-	User: bob, Password: ' OR 1=1; #
-	nie da się ponieważ pole $password jest haszowane
-2. Login without user password -  attempt 2
-	User: bob'; #
 
-`SELECT * FROM users where username='bob' and password='5f4dcc3b5aa765d61d8327deb882cf99';` 
-`bob'; #`
-`SELECT * FROM products WHERE product_name LIKE ''; DROP DATABASE if exists sqlitraining -- // ';`
+## Co zrobiliśmy? 
+1. Przeprowadzono badanie w celu sprawdzenia istniejących rozwiązań. Przetestowano trzy rózne środowiska testowe do nauczania się atakom SQL Injection: 
+	1. [OWASP WebGoat i OWASP Zap](https://thehackerish.com/sql-injection-examples-for-practice/) -  kompleksowy przewodnik po testowaniu bezpieczeństwa aplikacji internetowych i usług internetowych, spośród których jest również SQL Injection.
+	2. [SQL Injection Exercise](https://research.cs.wisc.edu/mist/SoftwareSecurityCourse/Exercises/3.8.1_SQL_Injection_Exercise.html) - wprowadzenie do bezpiecznego programowania. Niestety nie udało się sprawdzić, ponieważ maszyna wirtualna, podana w rozwiązaniu, nie urucamia się skutecznie. 
+	3. [Security of Information and Organizations - SQL Injection ](http://sweet.ua.pt/jpbarraca/course/sio-2122/lab-sql-injection/) - kurs *"Bezpieczeństwa informacji i organizacji"* od portugalskiego profesora João Paulo Barraca. Obszerny kurs laboratoriów bezpieczeństwa, które również pokrywają temat SQL Injection.
+2. Stwierdzono zrobić własne rozwiązanie, które byłoby podobnym do trzeciego rozwiązania *"Security of Information and Organizations - SQL Injection"*.
+3. Zakupiono i odpowiednio przygotowano Virtual Private Server (VPS) w systemie OVHCloud. Na nim został zainstalowany system Ubuntu. 
+4. Utworzono konta dla użytkowników (Jakub, Vitalii), zapewniono uwierzetylnianie tylko za pomocą szyfrowania asymetrycznego algorytmami RSA lub Ed25519. 
+5. Zainstalowano i odpowiednio skonfigurowano system bazodanowy PostgreSQL na VPS. Pobrano, ospowiednio zmodyfikowano i zainstalowano przykładową bazę danych Dell Store 2. 
+6. Zmodyfikowano kolumnę użytkowników "password" w taki sposób, aby zapisywane były hasła w postaci haszowanej. Znaleziono zbiór najczęściej wykorzystywanych haseł i przypisano go do wszystkich 20000 użytkowników.
+7. Przygotowano kod w języku Python do łączenia się z bazą danych oraz do przywrócenia bazy danych. 
+8. Przygotowano podatny na ataki SQL Injection kod w języku Python do wyłowania zapytań SQL.
+9. Za pomocą biblioteki Streamlit przygotowano stronę internetową - wizualny interfejs dla użytkownika. Strona zawiera trzy środowiska do przeprowadzania ataków: 
+	1. Panel logowania - jeden z najczęściej wykorzystywanych miejsc do ataku SQL Injection.
+	2. Panel rejestracji - pozwala tworzyć nowych użytkowników lub również przeprowadzać ataki.
+	3. Wyszukiwarka filmów - chclieliśmy pokazać jakie ataki można wykonywać, wykorzystując tabeli. 
+10. Na stronie internetowej również został dodany krótki poradnik na temat ataków SQL Injection z przykładami. Na każdym panelu są podane podpowiedzi z przykładowymi atakami. 
+11. Jeżeli użytkownik specjalnie czy przez przypadek zepsuję bazę danych, to na każdej stronie na panelu bocznym umieszczono przycisk, przywracający całą bazę. 
+12. Został przygotowany również poradnik, pokazujący w jaki sposób trzeba zmienić kod w języku Python, aby nie był już podatny na podstawowe ataki SQL Injection.
+
 
 
 ## Jak ulepszyć kod tak, aby nie był już podatny na ataki? 
@@ -76,6 +87,20 @@ location: /var/lib/postgresql/data
 ```
 name: dellstore2
 ```
+
+
+
+## Atacks
+1. Login without user password - attempt 1
+	User: bob, Password: ' OR 1=1; #
+	nie da się ponieważ pole $password jest haszowane
+2. Login without user password -  attempt 2
+	User: bob'; #
+
+`SELECT * FROM users where username='bob' and password='5f4dcc3b5aa765d61d8327deb882cf99';` 
+`bob'; #`
+`SELECT * FROM products WHERE product_name LIKE ''; DROP DATABASE if exists sqlitraining -- // ';`
+
 
 
 
