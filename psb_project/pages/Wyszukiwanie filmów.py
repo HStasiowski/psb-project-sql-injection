@@ -1,5 +1,7 @@
 import streamlit as st
 
+import sqlite3
+
 from psb_project.SQL_Injection import init_connection
 
 
@@ -9,6 +11,13 @@ def db_restart():
 
 
 def main():
+    if "user_id" not in st.session_state:
+        conn = sqlite3.connect('connections.db')
+        cursor = conn.cursor()
+        outcome = cursor.execute("insert into user default values returning id;")
+        st.session_state.user_id = outcome.fetchone()[0] 
+        conn.commit()
+        conn.close()
     st.title("Wyszukiwanie filmów: ")
     title = st.text_input("Wprowadź tytuł lub aktora filmu: ")
 
