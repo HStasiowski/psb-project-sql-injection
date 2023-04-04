@@ -1,9 +1,11 @@
 import configparser
 import logging
+import sqlite3
 
 import pandas as pd
 import psycopg2
-import sqlalchemy
+
+# import sqlalchemy
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -15,23 +17,23 @@ class DellStoreDB:
     def __init__(self):
         self.conn = None
         self.is_connected = False
-        self.sqlalchemy_engine: sqlalchemy.engine.base.Engine | None = None
+        # self.sqlalchemy_engine: sqlalchemy.engine.base.Engine | None = None
 
     def connect(self, **kwargs):
         """Connect to the PostgreSQL database server."""
         try:
             logging.info("Connecting to the PostgreSQL database...")
-            self.conn = psycopg2.connect(**kwargs)
-            self.sqlalchemy_engine = sqlalchemy.create_engine(
-                'postgresql+psycopg2://',
-                creator=lambda: self.conn)
+            self.conn = sqlite3.connect("./psb_project/dellstore2/dellstore2-sqlite.db")
+            # self.sqlalchemy_engine = sqlalchemy.create_engine(
+            #     'sqlite+pysqlite:///dellstore2/dellstore2-sqlite.db',
+            #     creator=lambda: self.conn)
 
             # Display PostgreSQL version
-            self.conn.autocommit = True
-            cur = self.conn.cursor()
-            cur.execute('SELECT version()')
-            logging.info(f"PostgreSQL version:\t{cur.fetchone()}")
-            cur.close()
+            # self.conn.autocommit = True
+            # cur = self.conn.cursor()
+            # cur.execute('SELECT version()')
+            # logging.info(f"PostgreSQL version:\t{cur.fetchone()}")
+            # cur.close()
 
         except (Exception, psycopg2.DatabaseError):
             logging.exception('')
@@ -103,7 +105,7 @@ class DellStoreDB:
         cur = self.conn.cursor()
         try:
             cur.execute(f"SELECT * "
-                        f"FROM dellstore2.public.customers "
+                        f"FROM customers "
                         f"WHERE username='{username}' AND password='{password}';")
         except Exception as e:
             ret_text = str(e)
@@ -122,31 +124,27 @@ class DellStoreDB:
         ret_text = ""
         cur = self.conn.cursor()
         try:
-            cur.execute(f"INSERT INTO dellstore2.public.customers (firstname, lastname, username, password) "
+            cur.executescript(f"INSERT INTO customers (firstname, lastname, username, password) "
                         f"VALUES ('{firstname}', '{lastname}', '{username}', '{password}') "
-                        f"on CONFLICT do NOTHING "
-                        f"RETURNING (xmax = 0) AS inserted;")
+                        f"on CONFLICT do NOTHING;")
         except Exception as e:
             ret_text = str(e)
             logging.error(str(e))
             return False, ret_text
         else:
-            ans = cur.fetchone()
+            self.conn.commit()
             cur.close()
             logging.debug(f"Registered user:{firstname=} {lastname=} {username=} {password=}")
-            if ans is None:
-                return False, ret_text
-            else:
-                return True, ret_text
+            return True, ret_text
 
     def get_products(self, user_query: str):
         ret_text = ""
-        sql_query = sqlalchemy.text(f"SELECT * "
-                                    f"FROM dellstore2.public.products "
-                                    f"WHERE (actor LIKE upper('%{user_query}%')) "
-                                    f"   OR (title LIKE upper('%{user_query}%'));")
+        sql_query = (f"SELECT * "
+                     f"FROM products "
+                     f"WHERE (actor LIKE upper('%{user_query}%')) "
+                     f"   OR (title LIKE upper('%{user_query}%'));")
         try:
-            df = pd.read_sql(sql_query, self.sqlalchemy_engine)
+            df = pd.read_sql(sql_query, self.conn)
         except Exception as e:
             ret_text = str(e)
             logging.error(str(e))
@@ -159,6 +157,6 @@ class DellStoreDB:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     db = DellStoreDB()
-    db.connect(**config["postgresql-dellstore2"])
+    db.connect()
     print(db.insert_user("vmorskyi", "123456", "vitalii", "morskyi"))
     db.disconnect()

@@ -69,7 +69,7 @@ def main():
         st.code("' OR 1=1;--", language="sql")
 
     st.sidebar.subheader("Przywracanie bazy do stanu początkowego")
-    if st.sidebar.button("Przywróć bazę"):
+    if st.sidebar.button("Przywróć bazę", key="przywroc_baze_panel_logowania"):
         st.session_state['db'].drop_tables()
         is_not_error, result = st.session_state['db'].fill_db()
         if is_not_error:
