@@ -23,7 +23,7 @@ def main():
 
     table, is_error, query_message = st.session_state['db'].get_products(title)
 
-    if st.button("❔ Wskazówka SQL Injection"):
+    if st.button("❔ Wskazówka SQL Injection", key="wskazowka_sql_injection"):
         st.write(
             "Wpisanie kodu w tym przypadku może odbyć się poprzez ucieczkę z warunków LIKE. Możemy następnie "
             "wykorzystać nowe zapytanie, zawierające np. prośbę o wyświetlenie tabeli klientów.")

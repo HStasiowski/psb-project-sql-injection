@@ -5,7 +5,7 @@ import sqlite3
 import pandas as pd
 import psycopg2
 
-# import sqlalchemy
+import sqlalchemy
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -17,16 +17,15 @@ class DellStoreDB:
     def __init__(self):
         self.conn = None
         self.is_connected = False
-        # self.sqlalchemy_engine: sqlalchemy.engine.base.Engine | None = None
+        self.sqlalchemy_engine: sqlalchemy.engine.base.Engine | None = None
 
     def connect(self, **kwargs):
         """Connect to the PostgreSQL database server."""
         try:
             logging.info("Connecting to the PostgreSQL database...")
             self.conn = sqlite3.connect("./psb_project/dellstore2/dellstore2-sqlite.db")
-            # self.sqlalchemy_engine = sqlalchemy.create_engine(
-            #     'sqlite+pysqlite:///dellstore2/dellstore2-sqlite.db',
-            #     creator=lambda: self.conn)
+            self.sqlalchemy_engine = sqlalchemy.create_engine(
+                'sqlite+pysqlite:///./psb_project/dellstore2/dellstore2-sqlite.db')
 
             # Display PostgreSQL version
             # self.conn.autocommit = True
@@ -143,8 +142,15 @@ class DellStoreDB:
                      f"FROM products "
                      f"WHERE (actor LIKE upper('%{user_query}%')) "
                      f"   OR (title LIKE upper('%{user_query}%'));")
+        cur = self.conn.cursor()
+        print(sql_query)
+        res = cur.execute(
+            sql_query
+        )
+        print(res.fetchall())
+        cur.close()
         try:
-            df = pd.read_sql(sql_query, self.conn)
+            df = pd.read_sql(sql_query, self.sqlalchemy_engine)
         except Exception as e:
             ret_text = str(e)
             logging.error(str(e))

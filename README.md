@@ -123,3 +123,25 @@ gdzie `1`  oznacza numer procesu w tle, można otrzymać wpisując `jobs -l`.
 - [x] Na zakładce "Wyszukiwarka filmów" raczej dobrze by było podnieść tą wskazówke SQL Inection do góry, bo na dole tam nikt jej nie znajdzie.
 - [x] Wskazówka na stronie logowania nie działa, bo używamy funkcji haszującej.
 
+### Docker commands 
+
+```shell
+docker image ls -a
+docker build -t psb-injection . 
+docker run --name some-postgres -e POSTGRES_PASSWORD=123456 -d -p 54330:5432 psb-injection
+psql -U postgres -d postgres --port=54330 -h localhost
+docker exec -it some-postgres /bin/bash 
+docker stop some-postgres
+docker rm some-postgres
+```
+
+
+```shell
+docker build -t psb-injection . 
+docker run --name some-postgres -e POSTGRES_PASSWORD=123456 -d -p 54330:5432 psb-injection
+docker exec -it some-postgres psql -U postgres -d postgres -a -f /usr/src/app/setup_db.sql 
+docker exec -it some-postgres psql -U sqlinjection -d dellstore2 -a -f /usr/src/app/dellstore2-normal-1.0.sql 
+
+docker stop some-postgres
+docker rm some-postgres
+```
